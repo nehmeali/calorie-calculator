@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Maintenance Calories Calculator</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        padding: 40px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+      }
+
+      h1 {
+        color: #fff;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+        margin-bottom: 32px;
+      }
+
+      .field {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+      }
+
+      input[type="number"]:focus {
+        border-color: #4fc3f7;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      input[type="number"]::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .radio-group,
+      .activity-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .radio-group label,
+      .activity-group label {
+        flex: 1;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .radio-option,
+      .activity-option {
+        flex: 1;
+        position: relative;
+      }
+
+      .radio-option input,
+      .activity-option input {
+        display: none;
+      }
+
+      .radio-option label,
+      .activity-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 11px 8px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .radio-option input:checked + label,
+      .activity-option input:checked + label {
+        background: rgba(79, 195, 247, 0.2);
+        border-color: #4fc3f7;
+        color: #4fc3f7;
+        font-weight: 600;
+      }
+
+      .radio-option label:hover,
+      .activity-option label:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+
+      .activity-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .activity-option label {
+        justify-content: flex-start;
+        padding: 13px 16px;
+        gap: 10px;
+      }
+
+      .activity-option label .activity-desc {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 400;
+        margin-left: 4px;
+      }
+
+      .activity-option input:checked + label .activity-desc {
+        color: rgba(79, 195, 247, 0.7);
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #4fc3f7, #0288d1);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 28px;
+        transition: opacity 0.2s, transform 0.15s;
+        letter-spacing: 0.3px;
+      }
+
+      button[type="submit"]:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      button[type="submit"]:active {
+        transform: translateY(0);
+      }
+
+      #result {
+        display: none;
+        margin-top: 28px;
+      }
+
+      .result-main {
+        background: rgba(79, 195, 247, 0.1);
+        border: 1px solid rgba(79, 195, 247, 0.3);
+        border-radius: 14px;
+        padding: 24px;
+        text-align: center;
+        margin-bottom: 12px;
+      }
+
+      #result .calories-label {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      #result .calories-value {
+        color: #4fc3f7;
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      #result .calories-unit {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .result-details {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .detail-item {
+        flex: 1;
+        text-align: center;
+      }
+
+      .detail-item .detail-value {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .detail-item .detail-label {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+
+      .goal-cards {
+        display: flex;
+        gap: 10px;
+      }
+
+      .goal-card {
+        flex: 1;
+        border-radius: 14px;
+        padding: 18px 14px;
+        text-align: center;
+      }
+
+      .goal-card.cutting {
+        background: rgba(255, 138, 101, 0.1);
+        border: 1px solid rgba(255, 138, 101, 0.3);
+      }
+
+      .goal-card.bulking {
+        background: rgba(102, 187, 106, 0.1);
+        border: 1px solid rgba(102, 187, 106, 0.3);
+      }
+
+      .goal-card .goal-icon {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+      }
+
+      .goal-card .goal-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .goal-card.cutting .goal-label { color: rgba(255, 138, 101, 0.85); }
+      .goal-card.bulking .goal-label { color: rgba(102, 187, 106, 0.85); }
+
+      .goal-card .goal-calories {
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 2px;
+      }
+
+      .goal-card.cutting .goal-calories { color: #ff8a65; }
+      .goal-card.bulking .goal-calories { color: #66bb6a; }
+
+      .goal-card .goal-unit {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 8px;
+      }
+
+      .goal-card .goal-delta {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 20px;
+        display: inline-block;
+      }
+
+      .goal-card.cutting .goal-delta {
+        background: rgba(255, 138, 101, 0.15);
+        color: rgba(255, 138, 101, 0.9);
+      }
+
+      .goal-card.bulking .goal-delta {
+        background: rgba(102, 187, 106, 0.15);
+        color: rgba(102, 187, 106, 0.9);
+      }
+
+      #error-msg {
+        display: none;
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: rgba(244, 67, 54, 0.15);
+        border: 1px solid rgba(244, 67, 54, 0.3);
+        border-radius: 10px;
+        color: #ef9a9a;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .height-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .height-input-wrap {
+        flex: 1;
+        position: relative;
+      }
+
+      .height-input-wrap input {
+        width: 100%;
+        padding: 12px 36px 12px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+      }
+
+      .height-input-wrap input:focus {
+        border-color: #4fc3f7;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .height-input-wrap input::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .height-unit {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+        font-weight: 600;
+        pointer-events: none;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        opacity: 0.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Calorie Calculator</h1>
+      <p class="subtitle">Find your daily maintenance calories</p>
+
+      <form id="calc-form">
+        <div class="field">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" placeholder="e.g. 28" min="10" max="110" required />
+        </div>
+
+        <div class="field">
+          <label>Sex</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="male" name="sex" value="male" required />
+              <label for="male">Male</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="female" name="sex" value="female" />
+              <label for="female">Female</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="weight">Weight (lbs)</label>
+          <input type="number" id="weight" name="weight" placeholder="e.g. 175" min="50" max="600" required />
+        </div>
+
+        <div class="field">
+          <label>Height</label>
+          <div class="height-group">
+            <div class="height-input-wrap">
+              <input type="number" id="height_ft" name="height_ft" placeholder="5" min="3" max="8" required />
+              <span class="height-unit">ft</span>
+            </div>
+            <div class="height-input-wrap">
+              <input type="number" id="height_in" name="height_in" placeholder="10" min="0" max="11" required />
+              <span class="height-unit">in</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="body_fat">Body Fat % (self-estimated)</label>
+          <input type="number" id="body_fat" name="body_fat" placeholder="e.g. 18" min="3" max="60" step="0.5" required />
+        </div>
+
+        <div class="field">
+          <label>Daily Exercise Level</label>
+          <div class="activity-group">
+            <div class="activity-option">
+              <input type="radio" id="very_active" name="activity" value="very_active" required />
+              <label for="very_active">
+                Very Active
+                <span class="activity-desc">— intense exercise most days</span>
+              </label>
+            </div>
+            <div class="activity-option">
+              <input type="radio" id="moderate" name="activity" value="moderate" />
+              <label for="moderate">
+                Moderate
+                <span class="activity-desc">— light/moderate exercise 3–5 days/week</span>
+              </label>
+            </div>
+            <div class="activity-option">
+              <input type="radio" id="low_none" name="activity" value="low_none" />
+              <label for="low_none">
+                Low / None
+                <span class="activity-desc">— little or no regular exercise</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit">Calculate My Calories</button>
+      </form>
+
+      <div id="error-msg"></div>
+
+      <div id="result">
+        <div class="result-main">
+          <div class="calories-label">Daily Maintenance Calories</div>
+          <div class="calories-value" id="result-calories">—</div>
+          <div class="calories-unit">calories / day</div>
+          <div class="result-details">
+            <div class="detail-item">
+              <div class="detail-value" id="result-bmr">—</div>
+              <div class="detail-label">BMR</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-value" id="result-lbm">—</div>
+              <div class="detail-label">Lean Mass (lbs)</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-value" id="result-multiplier">—</div>
+              <div class="detail-label">Activity Factor</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal-cards">
+          <div class="goal-card cutting">
+            <div class="goal-icon">🔥</div>
+            <div class="goal-label">Get Leaner</div>
+            <div class="goal-calories" id="result-cutting">—</div>
+            <div class="goal-unit">cal / day</div>
+            <div class="goal-delta">−400 cal deficit</div>
+          </div>
+          <div class="goal-card bulking">
+            <div class="goal-icon">💪</div>
+            <div class="goal-label">Bulk Up</div>
+            <div class="goal-calories" id="result-bulking">—</div>
+            <div class="goal-unit">cal / day</div>
+            <div class="goal-delta">+350 cal surplus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
